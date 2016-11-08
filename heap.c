@@ -1,7 +1,8 @@
 #include "heap.h"
 #include "vector_dinamico.h"
 #include <stdlib.h>
-#define TAM_INICIAL 1
+#include <stdio.h>
+#define TAM_INICIAL 10
 
 struct heap{
   vector_t *vector;
@@ -9,20 +10,19 @@ struct heap{
   size_t cantidad;
 };
 
+/*******************************************************************
+ *                       FUNCIONES AUXILIARES
+ ******************************************************************/
 
-void swap (void* valor1, void* valor2) {
-	void* dato_aux = valor1;
 
-	valor1 = valor2;
-	valor2 = dato_aux;
-}
 
 void upheap(heap_t *heap, size_t pos, size_t cantidad){
   vector_t *vector = heap->vector;
   if(pos <= 0) return;
-  size_t pos_padre = (i -1)/2;
-  if(heap->cmp(vector_obtener(vector, pos), vector_obtener(vector, pos_padre)) > 0){
-    swap(vector_obtener(vector, pos), vector_obtener(vector, pos_padre));
+  size_t pos_padre = (pos -1)/2;
+  void *padre = vector_obtener(vector, pos_padre), *actual = vector_obtener(vector, pos);
+  if(heap->cmp(actual, padre) > 0){
+    vector_swap(vector, pos, pos_padre);
     upheap(heap, pos_padre, cantidad);
   }
 
@@ -32,34 +32,47 @@ void upheap(heap_t *heap, size_t pos, size_t cantidad){
 void downheap(heap_t *heap, size_t pos, size_t cantidad){
   vector_t *vector = heap->vector;
   if(pos >= cantidad) return;
-  size_t pos_h_izq = pos*2 -1, pos_h_der = 2*pos -1, pos_padre = pos;
-  if(pos_h_izq < cantidad && heap->cmp(vector_obtener(vector, pos_padre), vector_obtener(vector, pos_h_izq)) < 0)
+  size_t pos_h_izq = 2*pos + 1 , pos_h_der = 2*pos + 2, pos_padre = pos;
+  void *hijo_izq = vector_obtener(vector, pos_h_izq);
+  void *hijo_der = vector_obtener(vector, pos_h_der);
+  if(pos_h_izq < cantidad && heap->cmp(vector_obtener(vector, pos_padre), hijo_izq) < 0)
     pos_padre = pos_h_izq;
-  if(pos_h_der < cantidad && heap->cmp(vector_obtener(vector, pos_padre), vector_obtener(vector, pos_h_der)) < 0)
+  if(pos_h_der < cantidad && heap->cmp(vector_obtener(vector, pos_padre), hijo_der) < 0)
     pos_padre = pos_h_der;
   if(pos != pos_padre){
-    swap(vector_obtener(vector, pos_padre), vector_obtener(vector, pos));
-    downheap(heap, pos_mayor, cantidad);
+    if(hijo_izq) printf("Izquiedo %d\n", *(int*)hijo_izq);
+    if(hijo_der) printf("Derecho %d\n", *(int*)hijo_der);
+    vector_swap(vector, pos_padre, pos);
+    printf("Quien queda como padre %d\n",*(int*)vector_obtener(vector, pos));
+    downheap(heap, pos_padre, cantidad);
   }
 }
 
-void heapify(vector_t *arreglo, size_t cantidad){
-  for(size_t i = (n/2)-1; i >= 0; i--){
-    downheap(heap, i, n);
+void heapify(heap_t *heap, size_t cantidad){
+  for(size_t i = (cantidad/2) - 1; i + 1 > 0 ; i--){
+    printf("el valor de i %ld", i);
+    printf(" valor : %d\n", *(int*)vector_obtener(heap->vector, i));
+    downheap(heap, i, cantidad);
   }
 }
 
 
-/* Función de heapsort genérica. Esta función ordena mediante heap_sort
- * un arreglo de punteros opacos, para lo cual requiere que se
- * le pase una función de comparación. Modifica el arreglo "in-place".
- * Nótese que esta función NO es formalmente parte del TAD Heap.
- */
+/*******************************************************************
+ *                             HEAPSORT
+ ******************************************************************/
+
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
-
+  heap_t *heap = heap_crear_arr(elementos, cant, cmp);
+  for(size_t i = 0; i < cant; i++){
+    elementos[i] = heap_desencolar(heap);
+  }
+  heap_destruir(heap, NULL);
 }
 
 
+/*******************************************************************
+ *                    PRIMITIVAS DEL HEAP
+ ******************************************************************/
 
 heap_t *heap_crear(cmp_func_t cmp){
   if(!cmp) return NULL;
@@ -82,19 +95,21 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
   heap_t *heap = heap_crear(cmp);
   if(!heap) return NULL;
   for(size_t i = 0; i < n; i++){
+    printf("%d\n", *(int*)arreglo[i]);
     if(!vector_guardar(heap->vector, arreglo[i])) return NULL;
+    printf(" lo que queda en el heap %d\n", *(int*)vector_obtener(heap->vector, i));
+    heap->cantidad++;
   }
   heapify(heap, n);
   return heap;
-
 }
 
 void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
   if(!heap) return;
-  for(size_t i = 0; i < heap->cantidad; i++){
-    if(destruir_elemento)
-      destruir_elemento(heap->vector[i]);
+  for(size_t i = 0; i < heap->cantidad && destruir_elemento; i++){
+    destruir_elemento(vector_obtener(heap->vector, i));
   }
+  vector_destruir(heap->vector);
   free(heap);
 }
 
@@ -118,17 +133,16 @@ bool heap_encolar(heap_t *heap, void *elem){
 }
 
 void *heap_ver_max(const heap_t *heap){
-  if(!heap) return NULL;
+  if(heap_esta_vacio(heap)) return NULL;
   return vector_obtener(heap->vector, 0);
 }
 
 void *heap_desencolar(heap_t *heap){
-  if(!heap) return NULL;
+  if(heap_esta_vacio(heap)) return NULL;
 
-  swap(vector_obtener(heap->vector, heap->cantidad -1), vector_obtener(heap->vector, 0));
+  vector_swap(heap->vector, heap->cantidad - 1, 0);// intercambia el ultimo con el primero.
   void * dato = vector_borrar(heap->vector, heap->cantidad -1);
   heap->cantidad--;
   downheap(heap, 0, heap->cantidad);
   return dato;
-
 }

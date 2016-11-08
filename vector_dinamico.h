@@ -35,21 +35,26 @@ void vector_destruir(vector_t* vector);
 // a nuevo_tam
 bool vector_redimensionar(vector_t* vector, size_t nuevo_tam);
 
+
+void vector_swap(vector_t *vector, size_t pos1, size_t pos2);
+
+
+void *vector_borrar(vector_t *vector, size_t pos);
+
 // Almacena en valor el dato guardado en la posición pos del vector
 // Pre: el vector fue creado
 // Post: se almacenó en valor el dato en la posición pos. Devuelve false si la
 // posición es inválida (fuera del rango del vector, que va de 0 a tamaño-1)
 void *vector_obtener(vector_t* vector, size_t pos);
 
-// Almacena el dato en la posición pos
+// Almacena el dato en la ultima posicion.
 // Pre: el vector fue creado
-// Post: se almacenó el valor en la posición pos. Devuelve false si la posición
-// es inválida (fuera del rango del vector, que va de 0 a tamaño-1) y true si
-// se guardó el valor con éxito.
-bool vector_guardar(vector_t* vector, size_t pos, void* dato);
+// Post: se almacenó el valor. Devuelve false si no se puede redimensionar
+// el tamaño del vector y true si se guardó el valor con éxito.
+bool vector_guardar(vector_t* vector, void* dato);
 
 // Devuelve el tamaño del vector
 // Pre: el vector fue creado
-size_t vector_obtener_tamanio(vector_t* vector);
+//size_t vector_obtener_tamanio(vector_t* vector);
 
 #endif // VECTOR_DINAMICO_H

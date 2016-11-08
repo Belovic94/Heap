@@ -12,7 +12,7 @@ void *vector_borrar(vector_t *vector, size_t pos){
 }
 void *vector_obtener(vector_t* vector, size_t pos){
   // verifica que el vector exista y que la posicion sea valida
-  if (!vector || ((pos < 0) || (pos >= vector->tam))) return NULL;
+  if (!vector || ((pos < 0) || (pos >= vector->cantidad))) return NULL;
   return vector->datos[pos];
 }
 
@@ -27,15 +27,20 @@ bool vector_guardar(vector_t* vector, void *dato){
   return true;
 }
 
-/*size_t vector_obtener_tamanio(vector_t* vector){
-  if (!vector) return 0; // verifica que el vector exista.
-  return vector->tam;
-}*/
+void vector_swap(vector_t *vector, size_t pos1, size_t pos2){
+  if(!vector) return;
+  if (((pos1 < 0) || (pos1 >= vector->cantidad)) ||
+     ((pos2 < 0) || (pos2 >= vector->cantidad))) return;
+  void *dato_aux = vector->datos[pos1];
+
+  vector->datos[pos1] = vector->datos[pos2];
+  vector->datos[pos2] = dato_aux;
+}
 
 vector_t* vector_crear(size_t tam){
   vector_t* vector = malloc(sizeof(vector_t));
 
-  if(vector == NULL) return NULL;
+  if(!vector) return NULL;
   vector->datos = malloc(tam * sizeof(void*));
 
   if (tam > 0 && !vector->datos){

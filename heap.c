@@ -92,7 +92,6 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
   for(size_t i = 0; i < n; i++){
     printf("%d\n", *(int*)arreglo[i]);
     if(!vector_guardar(heap->vector, arreglo[i])) return NULL;
-    printf(" lo que queda en el heap %d\n", *(int*)vector_obtener(heap->vector, i));
     heap->cantidad++;
   }
   heapify(heap, n);
@@ -103,8 +102,7 @@ void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
   if(!heap) return;
   for(size_t i = 0; i < heap->cantidad && destruir_elemento; i++){
     destruir_elemento(vector_obtener(heap->vector, i));
-  }
-  vector_destruir(heap->vector);
+  }  vector_destruir(heap->vector);
   free(heap);
 }
 

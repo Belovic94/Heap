@@ -40,18 +40,13 @@ void downheap(heap_t *heap, size_t pos, size_t cantidad){
   if(pos_h_der < cantidad && heap->cmp(vector_obtener(vector, pos_padre), hijo_der) < 0)
     pos_padre = pos_h_der;
   if(pos != pos_padre){
-    if(hijo_izq) printf("Izquiedo %d\n", *(int*)hijo_izq);
-    if(hijo_der) printf("Derecho %d\n", *(int*)hijo_der);
     vector_swap(vector, pos_padre, pos);
-    printf("Quien queda como padre %d\n",*(int*)vector_obtener(vector, pos));
     downheap(heap, pos_padre, cantidad);
   }
 }
 
 void heapify(heap_t *heap, size_t cantidad){
   for(size_t i = (cantidad/2) - 1; i + 1 > 0 ; i--){
-    printf("el valor de i %ld", i);
-    printf(" valor : %d\n", *(int*)vector_obtener(heap->vector, i));
     downheap(heap, i, cantidad);
   }
 }

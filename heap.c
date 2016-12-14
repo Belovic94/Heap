@@ -1,7 +1,6 @@
 #include "heap.h"
 #include "vector_dinamico.h"
 #include <stdlib.h>
-#include <stdio.h>
 #define TAM_INICIAL 10
 
 struct heap{
@@ -25,9 +24,7 @@ void upheap(heap_t *heap, size_t pos, size_t cantidad){
     vector_swap(vector, pos, pos_padre);
     upheap(heap, pos_padre, cantidad);
   }
-
 }
-
 
 void downheap(heap_t *heap, size_t pos, size_t cantidad){
   vector_t *vector = heap->vector;
@@ -90,7 +87,6 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
   heap_t *heap = heap_crear(cmp);
   if(!heap) return NULL;
   for(size_t i = 0; i < n; i++){
-    printf("%d\n", *(int*)arreglo[i]);
     if(!vector_guardar(heap->vector, arreglo[i])) return NULL;
     heap->cantidad++;
   }
@@ -132,8 +128,8 @@ void *heap_ver_max(const heap_t *heap){
 
 void *heap_desencolar(heap_t *heap){
   if(heap_esta_vacio(heap)) return NULL;
-
-  vector_swap(heap->vector, heap->cantidad - 1, 0);// intercambia el ultimo con el primero.
+  //intercambia el ultimo con el primero.
+  vector_swap(heap->vector, heap->cantidad - 1, 0);
   void * dato = vector_borrar(heap->vector, heap->cantidad -1);
   heap->cantidad--;
   downheap(heap, 0, heap->cantidad);

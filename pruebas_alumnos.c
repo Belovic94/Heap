@@ -17,7 +17,7 @@ int cmp_pila(const void *a, const void *b){
 }
 
 void destructor_pila(void* pila){
-   pila_destruir(pila,NULL);
+   pila_destruir((pila_t*)pila);
 }
 
 int comparar (const void *a, const void *b){
@@ -83,16 +83,18 @@ void pruebas_heap_volumen(void){
 }
 
 void pruebas_heapsort(int tam){
-  void *vec[tam]; //generar_vector(tam);
+  void *vec[tam];
   int vec_aux[tam];
-  for(int i = 0, int j = tam; i < tam; i++, j--){
+  int j = 0;
+  for(int i = 0; i < tam; i++){
+    j = tam - i;
     vec_aux[i] = j;
     vec[i] = &vec_aux[i];
   }
   bool ok = true;
   heap_sort(vec, tam, comparar);
   for(int i = 0; i < tam; i++){
-    ok &= *(int*)vec[i] == i;
+    if(*(int*)vec[i] != i) ok = false;
   }
   print_test("Prueba de heapsort", ok);
 }
@@ -100,12 +102,12 @@ void pruebas_heapsort(int tam){
 
 void pruebas_varias(){
    pila_t* pila1 = pila_crear();
-   pila_t* pila3 = pila_crear();
-   pila_apilar(pila1,NULL);
+   pila_t* pila2 = pila_crear();
+   pila_apilar(pila1, NULL);
    heap_t* heap = heap_crear(cmp_pila);
    bool ok = true;
-   ok &= heap_encolar(heap,pila1);
-   ok &= heap_encolar(heap,pila2);
+   ok &= heap_encolar(heap, pila1);
+   ok &= heap_encolar(heap, pila2);
    print_test("Encolar pilas en heap", ok);
    heap_destruir(heap, destructor_pila);
    print_test("Destruir heap", true);
